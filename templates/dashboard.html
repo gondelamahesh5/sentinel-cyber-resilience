@@ -203,6 +203,10 @@
             const resp = await fetch('/api/rerun');
             const data = await resp.json();
             if (data.status === 'ok') {
+                // Clear isolation state for fresh pipeline run
+                isolatedHosts = {};
+                sessionStorage.setItem('isolatedHosts', JSON.stringify(isolatedHosts));
+                currentAlerts = [];
                 showToast('Pipeline re-ran successfully! ' + data.details.total_alerts + ' alerts.', 'success');
                 appendToConsole('Pipeline complete: ' + JSON.stringify(data.details));
                 status.innerHTML = '🟢 Synced to Flask API';
@@ -435,6 +439,17 @@
         });
     }
 
-    window.onload = loadAlertsAutomatically;
+    window.onload = function() {
+        // Clear isolation state on every page load so demo always starts fresh
+        isolatedHosts = {};
+        sessionStorage.setItem('isolatedHosts', JSON.stringify(isolatedHosts));
+        currentAlerts = [];
+        loadAlertsAutomatically();
+        // Scroll to alert table after a short delay so user can see the rows
+        setTimeout(function() {
+            var table = document.getElementById('alertRows');
+            if (table) table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 800);
+    };
 </script>
 {% endblock %}
