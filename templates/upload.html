@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}SENTINEL // Upload Data{% endblock %}
+{% block content %}
+<div class="p-8 max-w-4xl mx-auto">
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-100">Upload Custom Datasets</h2>
+        <p class="text-sm text-gray-400 mt-2">Upload your own network flows and authentication logs. The AI engine will run the same Isolation Forest + correlation detection on your data.</p>
+    </div>
+
+    {% if result %}
+    <div class="bg-teal-950/40 border border-teal-800 rounded-xl p-6 mb-8">
+        <h3 class="text-lg font-bold text-teal-300 mb-4">Detection Results</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-gray-900/50 border border-gray-800 rounded-lg p-4 text-center">
+                <div class="text-2xl font-extrabold text-teal-400">{{ result.total_alerts }}</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Total Alerts</div>
+            </div>
+            <div class="bg-gray-900/50 border border-gray-800 rounded-lg p-4 text-center">
+                <div class="text-2xl font-extrabold text-red-400">{{ result.correlated_true }}</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">True Attacks</div>
+            </div>
+            <div class="bg-gray-900/50 border border-gray-800 rounded-lg p-4 text-center">
+                <div class="text-2xl font-extrabold text-amber-400">{{ result.correlated_false }}</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">False Positives</div>
+            </div>
+            <div class="bg-gray-900/50 border border-gray-800 rounded-lg p-4 text-center">
+                <div class="text-2xl font-extrabold text-purple-400">{{ result.network_rows }} + {{ result.auth_rows }}</div>
+                <div class="text-xs text-gray-500 uppercase tracking-wider mt-1">Net + Auth Rows</div>
+            </div>
+        </div>
+        <div class="mt-6">
+            <a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white shadow-lg shadow-teal-900/30 border border-teal-500/20 transition-all duration-200 hover:-translate-y-0.5">
+                View Results on Dashboard
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-2">
+                    Network Flows CSV
+                    <span class="text-gray-500 font-normal">(network_flows.csv)</span>
+                </label>
+                <div class="relative">
+                    <input type="file" name="network_csv" accept=".csv" required
+                           class="block w-full text-sm text-gray-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-900/30 file:text-teal-300 hover:file:bg-teal-800/30 file:border file:border-teal-700/50 file:cursor-pointer"/>
+                </div>
+                <p class="text-xs text-gray-500 mt-1.5">Required columns: flow_id, hour, src_host, dst_host, bytes_sent, bytes_received, duration_ms, port</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-2">
+                    Authentication Logs CSV
+                    <span class="text-gray-500 font-normal">(auth_logs.csv)</span>
+                </label>
+                <div class="relative">
+                    <input type="file" name="auth_csv" accept=".csv" required
+                           class="block w-full text-sm text-gray-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-900/30 file:text-purple-300 hover:file:bg-purple-800/30 file:border file:border-purple-700/50 file:cursor-pointer"/>
+                </div>
+                <p class="text-xs text-gray-500 mt-1.5">Required columns: log_id, hour, user, host, event_type, failed_attempts_last_hour</p>
+            </div>
+
+            <div class="bg-gray-950/50 border border-gray-800 rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-gray-300 mb-2">What happens after upload?</h4>
+                <ul class="text-xs text-gray-400 space-y-1.5 list-disc list-inside">
+                    <li>Isolation Forest models flag anomalies in both datasets independently</li>
+                    <li>Sequential pattern matcher correlates network + auth anomalies to reduce false positives</li>
+                    <li>MITRE ATT&CK technique mapping is applied to each correlated alert</li>
+                    <li>Results are saved and displayed on the Dashboard</li>
+                </ul>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold
+                               bg-gradient-to-r from-teal-600 to-teal-700
+                               hover:from-teal-500 hover:to-teal-600
+                               active:from-teal-700 active:to-teal-800
+                               text-white shadow-lg shadow-teal-900/30
+                               border border-teal-500/20
+                               transition-all duration-200
+                               hover:-translate-y-0.5 active:translate-y-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    Run Detection
+                </button>
+                <a href="/"
+                   class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold
+                          bg-gray-800 text-gray-300 border border-gray-700
+                          hover:bg-gray-700 hover:text-gray-200
+                          transition-all duration-200">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="mt-8 bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-4">Expected CSV Format</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h4 class="text-xs font-semibold text-gray-400 mb-2">network_flows.csv</h4>
+                <pre class="bg-gray-950 border border-gray-800 rounded-lg p-3 text-xs font-mono text-gray-400 overflow-x-auto">flow_id,hour,timestamp,src_host,dst_host,bytes_sent,bytes_received,duration_ms,port,is_attack
+1,0,2026-06-01 00:05,HOST-001,HOST-011,9726,11236,249,3389,0
+...</pre>
+            </div>
+            <div>
+                <h4 class="text-xs font-semibold text-gray-400 mb-2">auth_logs.csv</h4>
+                <pre class="bg-gray-950 border border-gray-800 rounded-lg p-3 text-xs font-mono text-gray-400 overflow-x-auto">log_id,hour,timestamp,user,host,event_type,failed_attempts_last_hour,is_attack
+1,0,2026-06-01 00:02,user01,HOST-003,login_success,0,0
+...</pre>
+            </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-4">The <code class="text-teal-400 bg-teal-950/50 px-1.5 py-0.5 rounded">is_attack</code> column is optional — if provided, ground truth accuracy metrics will be calculated. If absent, detection still runs normally.</p>
+    </div>
+</div>
+{% endblock %}
