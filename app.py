@@ -208,10 +208,11 @@ def logout():
 @login_required
 def dashboard():
     """Main dashboard view."""
-    response = make_response(render_template("dashboard.html", user=session.get("user"), role=session.get("role")))
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response = make_response(render_template("dashboard.html", user=session.get("user"), role=session.get("role"), cache_bust=str(int(time.time()))))
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
+    response.headers["Surrogate-Control"] = "no-store"
     return response
 
 
