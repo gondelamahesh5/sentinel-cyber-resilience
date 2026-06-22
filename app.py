@@ -22,7 +22,7 @@ from functools import wraps
 
 from flask import (
     Flask, render_template, jsonify, request,
-    redirect, url_for, session, flash
+    redirect, url_for, session, flash, make_response
 )
 
 # Add current directory to path so imports resolve correctly
@@ -208,7 +208,11 @@ def logout():
 @login_required
 def dashboard():
     """Main dashboard view."""
-    return render_template("dashboard.html", user=session.get("user"), role=session.get("role"))
+    response = make_response(render_template("dashboard.html", user=session.get("user"), role=session.get("role")))
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 
 @app.route("/network")
