@@ -310,15 +310,15 @@
             const networkHours = alert.network_followup_hours ? 'Hours ' + alert.network_followup_hours[0] + '–' + alert.network_followup_hours[1] : '';
 
             tbody.innerHTML +=
-                '<tr class="hover:bg-gray-800/30 transition cursor-pointer" onclick="toggleAlertDetails(' + index + ')">' +
-                    '<td class="p-4 text-center"><svg id="chevron-' + index + '" class="w-3.5 h-3.5 text-gray-500 inline transition transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></td>' +
+                '<tr class="hover:bg-gray-800/30 transition">' +
+                    '<td class="p-4 text-center"><button onclick="event.stopPropagation(); toggleAlertDetails(' + index + ')" class="text-gray-500 hover:text-gray-300"><svg id="chevron-' + index + '" class="w-3.5 h-3.5 inline transition transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button></td>' +
                     '<td class="p-4 font-mono font-medium text-gray-300">' + hostName + '</td>' +
                     '<td class="p-4">' + mitreDisplay + '</td>' +
                     '<td class="p-4 text-center font-bold font-mono text-teal-400">' + (confScore * 100).toFixed(1) + '%</td>' +
                     '<td class="p-4"><span class="px-2.5 py-1 text-xs border rounded-md uppercase font-semibold ' + badgeClass + '">' + riskLevel + '</span></td>' +
                     '<td class="p-4 text-gray-400 text-xs leading-relaxed max-w-md">' + displayReason + '</td>' +
                     '<td class="p-4 text-center">' +
-                        '<button onclick="event.stopPropagation(); executeMitigation(this,\'' + hostName + '\")" ' +
+                        '<button onclick="event.stopPropagation(); executeMitigation(this, \'' + hostName + '\')" ' +
                             'class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold ' +
                             'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 ' +
                             'active:from-red-700 active:to-red-800 text-white shadow-md ' +
